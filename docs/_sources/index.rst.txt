@@ -1,0 +1,22 @@
+AAMASLib Documentation
+======================
+
+Welcome to AAMASLib's documentation!
+
+AAMASLib is a Python library designed for AAMAS (Autonomous Agents and Multi-Agent Systems) worksheets .
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   installation
+   quickstart
+   api
+   examples
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

@@ -1,0 +1,46 @@
+Installation
+============
+
+Basic Installation
+------------------
+
+Install AAMASLib using pip:
+
+.. code-block:: bash
+
+   pip install aamaslib
+
+Development Installation
+------------------------
+
+For development, clone the repository and install in editable mode:
+
+.. code-block:: bash
+
+   git clone https://github.com/aamas/aamaslib.git
+   cd aamaslib
+   pip install -e .
+
+Optional Dependencies
+---------------------
+
+Install with reinforcement learning support:
+
+.. code-block:: bash
+
+   pip install aamaslib[rl]
+
+Install with development tools:
+
+.. code-block:: bash
+
+   pip install aamaslib[dev]
+
+Requirements
+------------
+
+- Python 3.12+
+- NumPy < 2.0
+- Matplotlib
+- ImageIO
+- PyYAML
