@@ -1,0 +1,535 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aamaslib.ca.envs &mdash; AAMASLib 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            AAMASLib
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">AAMASLib</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aamaslib.ca.envs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aamaslib.ca.envs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">aamaslib.ca.envs</span>
+<span class="sd">================</span>
+
+<span class="sd">Generic Cellular Automaton environment that is rule-agnostic and accepts pluggable update rules.</span>
+<span class="sd">Designed to be simple to use in AAMAS worksheets.</span>
+
+<span class="sd">Overview</span>
+<span class="sd">--------</span>
+<span class="sd">- Rule-agnostic: you can plug any cell-update function.</span>
+<span class="sd">- Neighbourhoods and boundary handling use the utilities provided by aamaslib.ca.</span>
+<span class="sd">- Useful for small experiments and educational purposes.</span>
+
+<span class="sd">Example</span>
+<span class="sd">-------</span>
+<span class="sd">Basic usage with a simple &quot;Game of Life&quot;-like rule:</span>
+
+<span class="sd">    import numpy as np</span>
+<span class="sd">    from aamaslib.ca import moore, boundary_dead, GridRenderer</span>
+<span class="sd">    from aamaslib.ca.envs import CellularEnvironment</span>
+
+<span class="sd">    def life_rule(grid, i, j, neighbours):</span>
+<span class="sd">        # classic Conway</span>
+<span class="sd">        if grid[i, j] == 1:</span>
+<span class="sd">            return 1 if neighbours in (2, 3) else 0</span>
+<span class="sd">        else:</span>
+<span class="sd">            return 1 if neighbours == 3 else 0</span>
+
+<span class="sd">    config = {</span>
+<span class="sd">        &quot;grid&quot;: [</span>
+<span class="sd">            &quot;....................&quot;,</span>
+<span class="sd">            &quot;....................&quot;,</span>
+<span class="sd">            &quot;....OOO.............&quot;,</span>
+<span class="sd">            &quot;....O...............&quot;,</span>
+<span class="sd">            &quot;.....O..............&quot;,</span>
+<span class="sd">            &quot;....................&quot;,</span>
+<span class="sd">            &quot;....................&quot;,</span>
+<span class="sd">            &quot;....................&quot;,</span>
+<span class="sd">            &quot;....................&quot;,</span>
+<span class="sd">            &quot;....................&quot;</span>
+<span class="sd">        ],</span>
+<span class="sd">        &quot;max_iterations&quot;: 50,</span>
+<span class="sd">        &quot;neighbourhood&quot;: {&quot;type&quot;: &quot;moore&quot;, &quot;radius&quot;: 1},</span>
+<span class="sd">        &quot;boundary&quot;: {&quot;type&quot;: &quot;dead&quot;},</span>
+<span class="sd">        &quot;rule&quot;: {&quot;type&quot;: &quot;conway&quot;}  # used only if you also pass a rule_registry</span>
+<span class="sd">    }</span>
+
+<span class="sd">    renderer = GridRenderer(mode=&quot;display&quot;, pause_ms=100)</span>
+<span class="sd">    env = CellularEnvironment(config, render_mode=&quot;human&quot;, renderer=renderer, update_rule=life_rule)</span>
+
+<span class="sd">    grid = env.reset()</span>
+<span class="sd">    terminated = truncated = False</span>
+<span class="sd">    while not (terminated or truncated):</span>
+<span class="sd">        grid, terminated, truncated, info = env.step()</span>
+<span class="sd">        env.render()</span>
+
+<span class="sd">    env.close()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aamaslib.ca.neighbourhoods</span><span class="w"> </span><span class="kn">import</span> <span class="n">NEIGHBOURHOODS</span>  <span class="c1"># moore/von_neumann/custom registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aamaslib.ca.boundaries</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOUNDARIES</span>         <span class="c1"># dead/wrap/mirror registry</span>
+
+
+<div class="viewcode-block" id="UpdateRuleProtocol">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.UpdateRuleProtocol">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UpdateRuleProtocol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Protocol for a cellular automaton update rule.</span>
+
+<span class="sd">    A rule is a callable with signature:</span>
+
+<span class="sd">        rule(grid, i, j, neighbours) -&gt; int</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Optional human-readable name for the rule (used in rendering).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">neighbours</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="CellularEnvironment">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CellularEnvironment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic cellular automaton environment with pluggable rules.</span>
+
+<span class="sd">    This environment evolves a binary grid (0 = dead, 1 = alive) using a provided</span>
+<span class="sd">    update rule and configurable neighborhood and boundary conditions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : dict</span>
+<span class="sd">        Configuration dictionary. Expected keys:</span>
+<span class="sd">        - grid: list[str]</span>
+<span class="sd">            Initial grid as a list of strings where &#39;O&#39; is alive and any other</span>
+<span class="sd">            character is treated as dead.</span>
+<span class="sd">        - max_iterations: int</span>
+<span class="sd">            Maximum number of steps before truncation.</span>
+<span class="sd">        - neighbourhood: dict</span>
+<span class="sd">            {</span>
+<span class="sd">              &quot;type&quot;: &quot;moore&quot; | &quot;von_neumann&quot; | &quot;custom&quot;,</span>
+<span class="sd">              &quot;radius&quot;: int (for moore or von_neumann),</span>
+<span class="sd">              &quot;custom_offsets&quot;: list[tuple[int, int]] (if type == &quot;custom&quot;)</span>
+<span class="sd">            }</span>
+<span class="sd">        - boundary: dict</span>
+<span class="sd">            {&quot;type&quot;: &quot;dead&quot; | &quot;wrap&quot; | &quot;mirror&quot;}</span>
+<span class="sd">        - rule: dict</span>
+<span class="sd">            {&quot;type&quot;: &quot;&lt;name&gt;&quot;} used only if you also pass a rule_registry.</span>
+<span class="sd">    env_shape : str, default=&quot;grid&quot;</span>
+<span class="sd">        Currently supports only &quot;grid&quot; (directly uses config[&quot;grid&quot;]).</span>
+<span class="sd">    rule_registry : dict[str, Callable], optional</span>
+<span class="sd">        Optional registry for looking up a rule by name in config[&quot;rule&quot;][&quot;type&quot;].</span>
+<span class="sd">        If provided and no explicit update_rule is passed, the environment will</span>
+<span class="sd">        resolve the rule via this registry.</span>
+<span class="sd">    render_mode : str, optional</span>
+<span class="sd">        If &quot;human&quot; and a renderer is provided, render() will display the grid.</span>
+<span class="sd">    renderer : Any, optional</span>
+<span class="sd">        An object compatible with aamaslib.ca.rendering.GridRenderer:</span>
+<span class="sd">        must implement .show(grid, iteration, update_rule_name) and .close().</span>
+<span class="sd">    update_rule : Callable, optional</span>
+<span class="sd">        Explicitly provide the rule callable. If provided, it overrides rule_registry.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The environment is intentionally minimal and not tied to Gymnasium APIs,</span>
+<span class="sd">      but it follows a similar pattern: reset() and step() returning</span>
+<span class="sd">      (observation, terminated, truncated, info).</span>
+<span class="sd">    - The observation is the current grid (np.ndarray[int]).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+    <span class="c1"># Construction helpers</span>
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+
+<div class="viewcode-block" id="CellularEnvironment.from_yaml">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment.from_yaml">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_yaml</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">yaml_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">overrides</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CellularEnvironment&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct an environment from a YAML configuration file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        yaml_path : str</span>
+<span class="sd">            Path to a YAML file containing the configuration (see class docstring).</span>
+<span class="sd">        overrides : dict, optional</span>
+<span class="sd">            Dict of keys to update/override the loaded configuration.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Additional arguments forwarded to the class constructor (e.g. renderer, update_rule).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        CellularEnvironment</span>
+<span class="sd">            Configured environment instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">overrides</span><span class="p">:</span>
+            <span class="c1"># shallow update is sufficient for typical keys; deep-merge if needed</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">env_shape</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;grid&quot;</span><span class="p">,</span>
+        <span class="n">rule_registry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">render_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">renderer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">update_rule</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">UpdateRuleProtocol</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># --- Resolve rule ---</span>
+        <span class="k">if</span> <span class="n">update_rule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span> <span class="o">=</span> <span class="n">update_rule</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rule_cfg</span> <span class="o">=</span> <span class="p">(</span><span class="n">config</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rule&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">rule_name</span> <span class="o">=</span> <span class="n">rule_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rule_name</span> <span class="ow">and</span> <span class="n">rule_registry</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span> <span class="o">=</span> <span class="n">rule_registry</span><span class="p">[</span><span class="n">rule_name</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rule &#39;</span><span class="si">{</span><span class="n">rule_name</span><span class="si">}</span><span class="s2">&#39; not found in provided rule_registry.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;No update_rule provided and no resolvable rule via rule_registry. &quot;</span>
+                    <span class="s2">&quot;Provide `update_rule=` or pass a `rule_registry` and set config[&#39;rule&#39;][&#39;type&#39;].&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># --- Parse initial grid ---</span>
+        <span class="k">if</span> <span class="n">env_shape</span> <span class="o">!=</span> <span class="s2">&quot;grid&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported env_shape: </span><span class="si">{</span><span class="n">env_shape</span><span class="si">!r}</span><span class="s2">. Only &#39;grid&#39; is supported.&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">symbol_grid</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;config[&#39;grid&#39;] is required (list[str] with &#39;O&#39; for alive).&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">symbol_grid</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">symbol_grid</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;config[&#39;grid&#39;] must be a list of strings.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">cell</span> <span class="o">==</span> <span class="s2">&quot;O&quot;</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">symbol_grid</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_grid</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># --- Iteration limits ---</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;max_iterations&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;config[&#39;max_iterations&#39;] is required (int).&quot;</span><span class="p">)</span>
+
+        <span class="c1"># --- Neighborhood ---</span>
+        <span class="n">nb_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;neighbourhood&quot;</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">nb_type</span> <span class="o">=</span> <span class="n">nb_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;moore&quot;</span><span class="p">)</span>
+        <span class="n">nb_rad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nb_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;radius&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">nb_cust</span> <span class="o">=</span> <span class="n">nb_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;custom_offsets&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nb_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NEIGHBOURHOODS</span> <span class="ow">and</span> <span class="n">nb_type</span> <span class="o">!=</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown neighbourhood: </span><span class="si">{</span><span class="n">nb_type</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nb_type</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nb_cust</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Custom neighbourhood requires &#39;custom_offsets&#39;.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_neighbour_offsets</span> <span class="o">=</span> <span class="n">NEIGHBOURHOODS</span><span class="p">[</span><span class="s2">&quot;custom&quot;</span><span class="p">](</span><span class="n">nb_cust</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_neighbour_offsets</span> <span class="o">=</span> <span class="n">NEIGHBOURHOODS</span><span class="p">[</span><span class="n">nb_type</span><span class="p">](</span><span class="n">nb_rad</span><span class="p">)</span>
+
+        <span class="c1"># --- Boundary ---</span>
+        <span class="n">bd_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;boundary&quot;</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">bd_type</span> <span class="o">=</span> <span class="n">bd_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;dead&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">BOUNDARIES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown boundary: </span><span class="si">{</span><span class="n">bd_type</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_fn</span> <span class="o">=</span> <span class="n">BOUNDARIES</span><span class="p">[</span><span class="n">bd_type</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+        <span class="c1"># --- State ---</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># --- Rendering ---</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_mode</span> <span class="o">=</span> <span class="n">render_mode</span>  <span class="c1"># &quot;human&quot; or None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer</span>        <span class="c1"># e.g., an instance of aamaslib.ca.rendering.GridRenderer</span>
+
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+    <span class="c1"># Environment API</span>
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+
+<div class="viewcode-block" id="CellularEnvironment.reset">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset environment to the initial grid.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            A copy of the initial grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_grid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CellularEnvironment.step">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment.step">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Advance the environment by one step using the update rule.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        observation : np.ndarray</span>
+<span class="sd">            The new grid after applying the rule.</span>
+<span class="sd">        terminated : bool</span>
+<span class="sd">            True if a terminal condition is reached (e.g., all cells dead).</span>
+<span class="sd">        truncated : bool</span>
+<span class="sd">            True if max_iterations has been reached.</span>
+<span class="sd">        info : dict</span>
+<span class="sd">            Additional information about the state (iteration, live_cells, rule name).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call reset() before step().&quot;</span><span class="p">)</span>
+
+        <span class="n">truncated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iterations</span>
+        <span class="k">if</span> <span class="n">truncated</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;max_iterations&quot;</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get_state</span><span class="p">()}</span>
+
+        <span class="c1"># Apply update rule to each cell</span>
+        <span class="n">new_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>
+                <span class="n">neighbours</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_neighbours</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="n">new_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">neighbours</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">new_grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">terminated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_terminated</span><span class="p">()</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span></div>
+
+
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+    <span class="c1"># Helpers</span>
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_count_neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Count live neighbours for a given cell using the configured neighborhood and boundary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row : int</span>
+<span class="sd">            Row index of the cell.</span>
+<span class="sd">        col : int</span>
+<span class="sd">            Column index of the cell.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of live neighbours.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Grid must be initialized (call reset()).&quot;</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">di</span><span class="p">,</span> <span class="n">dj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neighbour_offsets</span><span class="p">:</span>
+            <span class="n">ni</span><span class="p">,</span> <span class="n">nj</span><span class="p">,</span> <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_fn</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">di</span><span class="p">,</span> <span class="n">dj</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="n">ni</span><span class="p">,</span> <span class="n">nj</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check for terminal condition.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if all cells are dead; otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Grid must be initialized (call reset()).&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+    <span class="c1"># Introspection</span>
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Observation space shape.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (int, int)</span>
+<span class="sd">            Height and width of the grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CellularEnvironment.get_state">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment.get_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get current environment state information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            {</span>
+<span class="sd">              &#39;grid&#39;: np.ndarray,</span>
+<span class="sd">              &#39;iteration&#39;: int,</span>
+<span class="sd">              &#39;live_cells&#39;: int,</span>
+<span class="sd">              &#39;rule_name&#39;: str</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Grid must be initialized (call reset()).&quot;</span>
+        <span class="n">rule_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rule_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Fall back to function name or repr</span>
+            <span class="n">rule_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="s2">&quot;iteration&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span>
+            <span class="s2">&quot;live_cells&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">)),</span>
+            <span class="s2">&quot;rule_name&quot;</span><span class="p">:</span> <span class="n">rule_name</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+    <span class="c1"># Rendering</span>
+    <span class="c1"># --------------------------------------------------------------------- #</span>
+
+<div class="viewcode-block" id="CellularEnvironment.render">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render the current grid state through the configured renderer (if any).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_mode</span> <span class="o">==</span> <span class="s2">&quot;human&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rule_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_rule</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">,</span> <span class="s2">&quot;rule&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CellularEnvironment.close">
+<a class="viewcode-back" href="../../../api.html#aamaslib.ca.envs.CellularEnvironment.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean up renderer resources (if any).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">close_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">close_fn</span><span class="p">):</span>
+                <span class="n">close_fn</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, UWE MPH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

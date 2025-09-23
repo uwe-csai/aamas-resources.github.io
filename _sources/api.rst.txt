@@ -1,0 +1,63 @@
+API Reference
+=============
+
+This page contains the complete API reference for AAMASLib.
+
+Cellular Automata Module
+-------------------------
+
+.. automodule:: aamaslib.ca
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Neighbourhoods
+~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.neighbourhoods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Boundary Conditions
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.boundaries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Grid Rendering
+~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.rendering
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Environment
+~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.envs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Utilities
+~~~~~~~~~
+
+.. automodule:: aamaslib.ca.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Reinforcement Learning Module
+-----------------------------
+
+.. automodule:: aamaslib.rl
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. note::
+   The reinforcement learning module is currently under development.

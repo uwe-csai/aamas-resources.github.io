@@ -1,0 +1,65 @@
+Quick Start Guide
+=================
+
+This guide will help you get started with AAMASLib's cellular automata features.
+
+Basic Usage
+-----------
+
+Here's a simple example of using AAMASLib:
+
+.. code-block:: python
+
+   import numpy as np
+   from aamaslib.ca import moore, boundary_wrap, GridRenderer
+
+   # Create a Moore neighbourhood
+   neighborhood = moore(radius=1)
+   print(f"Moore neighbourhood has {len(neighborhood)} neighbours")
+
+   # Set up boundary conditions
+   boundary_fn = boundary_wrap(height=10, width=10)
+
+   # Create a grid renderer
+   renderer = GridRenderer(mode="display")
+   
+   # Create and display a random grid
+   grid = np.random.randint(0, 2, (10, 10))
+   renderer.show(grid, iteration=0, update_rule="Random")
+   renderer.close()
+
+Neighbourhoods
+-------------
+
+AAMASLib supports different neighbourhood types:
+
+.. code-block:: python
+
+   from aamaslib.ca import moore, von_neumann, custom_offsets
+
+   # Moore neighbourhood (8 neighbors)
+   moore_neighbours = moore(radius=1)
+
+   # Von Neumann neighbourhood (4 neighbors)  
+   von_neumann_neighbours = von_neumann(radius=1)
+
+   # Custom neighbourhood
+   custom_neighbours = custom_offsets([(0, 1), (0, -1), (1, 0), (-1, 0)])
+
+Boundary Conditions
+-------------------
+
+Handle grid boundaries in different ways:
+
+.. code-block:: python
+
+   from aamaslib.ca import boundary_dead, boundary_wrap, boundary_mirror
+
+   # Dead boundaries (cells outside grid are inactive)
+   dead_boundary = boundary_dead(height=10, width=10)
+
+   # Wrap-around boundaries (toroidal)
+   wrap_boundary = boundary_wrap(height=10, width=10)
+
+   # Mirror boundaries (reflect at edges)
+   mirror_boundary = boundary_mirror(height=10, width=10)
