@@ -1,0 +1,80 @@
+Examples
+========
+
+This section contains practical examples of using AAMASLib.
+
+Conway's Game of Life
+---------------------
+
+Here's how you might implement Conway's Game of Life using AAMASLib:
+
+.. code-block:: python
+
+   import numpy as np
+   from aamaslib.ca import moore, boundary_dead, GridRenderer
+
+   def count_neighbors(grid, row, col, neighbourhood, boundary_fn):
+       """Count live neighbors for a cell."""
+       count = 0
+       for di, dj in neighbourhood:
+           ni, nj, valid = boundary_fn(row, col, di, dj)
+           if valid and grid[ni, nj] == 1:
+               count += 1
+       return count
+
+   def game_of_life_step(grid):
+       """Perform one step of Conway's Game of Life."""
+       height, width = grid.shape
+       new_grid = np.zeros_like(grid)
+       neighbourhood = moore(radius=1)
+       boundary_fn = boundary_dead(height, width)
+       
+       for i in range(height):
+           for j in range(width):
+               neighbours = count_neighbors(grid, i, j, neighbourhood, boundary_fn)
+               
+               if grid[i, j] == 1:  # Alive cell
+                   if neighbours in [2, 3]:
+                       new_grid[i, j] = 1
+               else:  # Dead cell
+                   if neighbours == 3:
+                       new_grid[i, j] = 1
+       
+       return new_grid
+
+   # Initialize with a glider pattern
+   grid = np.zeros((20, 20), dtype=int)
+   grid[1, 2] = 1
+   grid[2, 3] = 1
+   grid[3, 1:4] = 1
+
+   # Run simulation
+   renderer = GridRenderer(mode="display", pause_ms=200)
+   
+   for iteration in range(50):
+       renderer.show(grid, iteration, "Conway's Game of Life")
+       grid = game_of_life_step(grid)
+   
+   renderer.close()
+
+Creating GIFs
+-------------
+
+Generate animated GIFs of your cellular automata:
+
+.. code-block:: python
+
+   import numpy as np
+   from aamaslib.ca import GridRenderer
+
+   # Create renderer in GIF mode
+   renderer = GridRenderer(mode="gif", fps=5)
+
+   # Generate some frames
+   for i in range(20):
+       grid = np.random.randint(0, 2, (10, 10))
+       renderer.show(grid, iteration=i, update_rule="Random")
+
+   # Save the GIF
+   renderer.save_gif("random_evolution.gif")
+   renderer.close()

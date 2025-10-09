@@ -1,0 +1,20 @@
+Installation
+============
+
+Basic Installation
+------------------
+
+Install AAMASLib using pip:
+
+.. code-block:: bash
+
+   pip install --extra-index-url https://uwe-csai.github.io/aamas-resources.github.io/simple aamaslib
+
+Requirements
+------------
+
+- Python 3.12+
+- NumPy < 2.0
+- Matplotlib
+- ImageIO
+- PyYAML

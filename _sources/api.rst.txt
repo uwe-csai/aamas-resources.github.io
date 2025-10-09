@@ -1,0 +1,99 @@
+API Reference
+=============
+
+This page contains the complete API reference for AAMASLib.
+
+Cellular Automata Module
+-------------------------
+
+Environment
+~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.envs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Algorithms/Update Rules
+~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.algos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Neighbourhoods
+~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.neighbourhoods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Boundary Conditions
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.boundaries
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Rendering
+~~~~~~~~~~~~~~
+
+.. automodule:: aamaslib.ca.rendering
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Utilities
+~~~~~~~~~
+
+.. automodule:: aamaslib.ca.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Robot Grid Environment Module
+-----------------------------
+
+Environment Base
+~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: aamaslib.ge.base_env
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Agent
+~~~~~
+.. automodule:: aamaslib.ge.agent
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Algorithms
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: aamaslib.ge.base_algo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: aamaslib.ge.algos_ge
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Rendering
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: aamaslib.ge.render_ge
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RL Plotting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: aamaslib.ge.plot_rl
+   :members:
+   :undoc-members:
+   :show-inheritance:
